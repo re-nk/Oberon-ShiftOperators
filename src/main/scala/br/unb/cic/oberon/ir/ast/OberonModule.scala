@@ -112,6 +112,8 @@ sealed trait Number extends Expression {
   def -(that: Number): Number
   def *(that: Number): Number
   def /(that: Number): Number
+  def <<(that: Number): Number
+  def >>(that: Number): Number
 
 }
 
@@ -139,6 +141,16 @@ case class IntValue(value: Int) extends Value with Modular {
   def /(that: Number): Number = that match {
     case other: IntValue  => IntValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
+  }
+
+// Scala currently only supports << >> for int and long 
+  def << (that: Number): Number = that match {
+    case other: IntValue  => IntValue(value << other.value)
+    case other: RealValue => throw new RuntimeException("Scala only supports shift operators for Int and Long")
+  }
+  def >> (that: Number): Number = that match {
+    case other: IntValue  => IntValue(value >>  other.value)
+    case other: RealValue => throw new RuntimeException("Scala only supports shift operators for Int and Long")
   }
 
   val positiveMod = (x: Int, y: Int) => {
@@ -172,6 +184,17 @@ case class RealValue(value: Double) extends Value with Number {
     case other: IntValue  => RealValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
   }
+
+  def << (that: Number): Number = that match {
+    case other: IntValue  => throw new RuntimeException("Scala only supports shift operators for Int and Long")
+    case other: RealValue => throw new RuntimeException("Scala only supports shift operators for Int and Long")
+  }
+
+  def >> (that: Number): Number = that match {
+    case other: IntValue  => throw new RuntimeException("Scala only supports shift operators for Int and Long")
+    case other: RealValue => throw new RuntimeException("Scala only supports shift operators for Int and Long")
+  }
+
 }
 
 case class CharValue(value: Char) extends Value { type T = Char }
@@ -212,6 +235,8 @@ case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
 case class LambdaExpression(args: List[FormalArg], exp: Expression)
     extends Expression
+case class LeftShift(left: Expression, right: Expression) extends Expression
+case class RightShift(left: Expression, right: Expression) extends Expression
 
 /* Statements */
 trait Statement {

@@ -289,7 +289,10 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     case FunctionCallExpression(name, args) => evalFunctionCall(name, args)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
+    case LeftShift(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1.asInstanceOf[Number] << v2.asInstanceOf[Number])
+    case RightShift(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1.asInstanceOf[Number] >> v2.asInstanceOf[Number])
   }
+  
 
   def evalVarExpression(name: String): IResult[Expression] = for {
     env <- get[Environment[Expression]]
